@@ -9,32 +9,100 @@ const renderCategories = async () => {
 	try {
 		const dataCat = await apiRest.getApiData(refs.qCategories);
 		console.log(dataCat);
-		render.createMarcup(refs.categoryList, dataCat.data, render.markUpCategories);
+		render.createMarcup(refs.categoryList, dataCat.data, render.markUpCategories, true);
 	}
 	catch (e) {
 		console.log(e.message);
 	}
-
 }
+const renderProducts = async (queryLink, loadMore = false) => {
+	render.hideViewElement(refs.load_more, "hidden");
+	render.showViewElement(refs.divNotFound, "not-found--visible");
 
-const renderProducts = async (queryLink) => {
 	try {
 		const dataProd = await apiRest.getApiData(queryLink);
-		console.log(dataProd);
-		render.createMarcup(refs.productList, dataProd.data.products, render.markUpProducts);
+		if (dataProd.data.products.length === 0) {
+			render.hideViewElement(refs.divNotFound, "not-found--visible");
+		}
+		//console.log(dataProd);
+		render.createMarcup(refs.productList, dataProd.data.products, render.markUpProducts, !loadMore);
+		refs.totalItems = dataProd.data.total;
+
+		console.log(refs.totalItems, refs.currentPage * refs.defLimit);
+
+		if (refs.totalItems > refs.currentPage * refs.defLimit) {
+			render.showViewElement(refs.load_more, "hidden");
+		}
+	}
+	catch (e) {
+		console.log(e.message);
+	}
+	finally {
+		refs.load_more.disabled = false;
+	}
+}
+const renderProductsModal = async (queryLink) => {
+	try {
+		const dataProd = await apiRest.getApiData(queryLink);
+		console.log(dataProd.data, refs.productModal);
+		render.createMarcup(refs.productModal, dataProd.data, render.markUpProductModal, true);
+		refs.sectionModal.classList.add('modal--is-open');
 	}
 	catch (e) {
 		console.log(e.message);
 	}
 }
-
 
 
 refs.categoryList.addEventListener("click", (e) => {
 	const li = e.target.closest(".categories__item");
 	if (!li) return;
+
+	refs.currentPage = 1;
 	render.clearElement(refs.productList);
-	renderProducts(li.dataset.url);
+	refs.currentQuery = li.dataset.url;
+
+	const vQuery = refs.currentQuery + `?limit=12&skip=${(refs.currentPage - 1) * 12}`;
+	renderProducts(vQuery);
 });
+refs.load_more.addEventListener("click", (e) => {
+	refs.load_more.disabled = true;
+	refs.currentPage++;
+	const vQuery = refs.currentQuery + `&limit=${refs.defLimit}&skip=${(refs.currentPage - 1) * refs.defLimit}`;
+	console.log(vQuery);
+	renderProducts(vQuery, true);
+
+});
+refs.productList.addEventListener("click", (e) => {
+	const prodEl = e.target.closest(".products__item");
+	if (!prodEl) return;
+
+	console.log(prodEl);
+	const prodId = prodEl.dataset.id;
+
+	const vQuery = refs.BASE_URL + `/${prodId}`;
+	console.log(vQuery);
+
+	renderProductsModal(vQuery);
+})
+refs.closeBtnModal.addEventListener("click", (e) => {
+	refs.sectionModal.classList.remove('modal--is-open');
+})
+refs.searchForm.addEventListener("submit", (e) => {
+	e.preventDefault();
+
+	refs.currentPage = 1;
+	//renderTools.clearElement(renderTools.productList);
+	const searchData = e.currentTarget.elements['searchValue'].value.trim();
+
+	if (!searchData) return;
+
+	if (searchData.length < 1) return;
+	refs.currentQuery = refs.BASE_URL + `/search?q=${searchData}`;
+	const vQuery = `${refs.currentQuery}&limit=${refs.defLimit}&skip=${(refs.currentPage - 1) * refs.defLimit}`;
+	console.log(vQuery);
+
+	renderProducts(vQuery);
+})
 
 renderCategories();

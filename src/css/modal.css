@@ -90,11 +90,23 @@
 }
 
 .modal-product__price {
-  margin: 1rem 0;
+  margin: 0.3rem 0;
 
   color: #ff6b0a;
   font-size: 1.5rem;
   font-weight: 700;
+}
+
+.modal-product__price-before {
+  margin: 0.3rem 0;
+
+  color: #4a5568;
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+.modal-product__price-before-cross {
+  text-decoration: line-through;
 }
 
 .modal__close-btn {
