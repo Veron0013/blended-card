@@ -3,11 +3,9 @@
 import refs from "./refs";
 
 export function createMarcup(element, data, callBack, clearElement = false) {
-
 	if (clearElement) {
 		element.innerHTML = "";
 	}
-
 	element.insertAdjacentHTML("beforeend", callBack(data));
 }
 
@@ -19,10 +17,10 @@ export const markUpCategories = (data) => {
 				</li>`;
 	})
 		.join("");
-	return mkData + `<li class="categories__item" data-url="${refs.BASE_URL}">
+	return `<li class="categories__item" data-url="${refs.BASE_URL}">
 					<button  class="categories__btn" type="button">ALL
 					</button>
-				</li>`
+				</li>${mkData}`
 }
 
 export const markUpProducts = (data) => {
@@ -39,10 +37,9 @@ export const markUpProducts = (data) => {
 	return mkData;
 }
 
-export const markUpProductModal = ({ title, description, dimensions, category, price, discountPercentage, rating, stock, brand, sku, reviews, returnPolicy, images, shippingInformation, tags }) => {
-	const tagsMark = tags
-		.map(tag => `<li class="modal-product__tag-item">#${tag}</li>`)
-		.join('');
+export const markUpProductModal = ({ id, title, description, dimensions, category, price, discountPercentage, rating, stock, brand, sku, reviews, returnPolicy, images, shippingInformation, tags }) => {
+	const tagsList = tags?.map(tag => `<li class="modal-product__tag-item">#${tag}</li>`) || [];
+	const tagsMark = tagsList.join('');
 
 	const dicsount = discountPercentage > 5 ? ` <p class="modal-product__price-before">Price: <span class="modal-product__price-before-cross">${Math.round(price * (1 + (discountPercentage / 100)))}$</span></p>` : ``;
 
@@ -56,7 +53,9 @@ export const markUpProductModal = ({ title, description, dimensions, category, p
 				<p class="modal-product__price">Price: ${price}$</p>
         <button class="load-more__btn" type="button">Buy</button>
       </div>`;
-	console.log(mkData);
+	//console.log("mark", mkData);
+
+	refs.productID = id;
 
 	return mkData;
 }

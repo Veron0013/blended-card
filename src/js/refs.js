@@ -7,6 +7,7 @@ export default {
 	currentPage: 1,
 	totalItems: 0,
 	defLimit: 12,
+	productID: 0,
 	//LS vars
 	WL_DATA: "wishListData",
 	CD_DATA: "cardData",
@@ -22,6 +23,7 @@ export default {
 	sectionModal: document.querySelector(".modal"),
 	closeBtnModal: document.querySelector(".modal__close-btn"),
 	//card ==== wishlist
+	arrOfCounters: document.querySelectorAll("nav__count"),
 	addToWishList: document.querySelector(".modal-product__btn--wishlist"),
 	addToCart: document.querySelector(".modal-product__btn--cart"),
 	cardCount: document.querySelector("[data-cart-count]"),

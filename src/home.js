@@ -2,7 +2,7 @@
 import refs from "./js/refs.js";
 import * as render from "./js/render-function.js";
 import * as apiRest from "./js/products-api.js";
-import * as helper from "./js/helpers.js";
+import * as storageLib from "./js/storage.js";
 
 
 
@@ -24,7 +24,10 @@ const renderProducts = async (queryLink, loadMore = false) => {
 
 	try {
 		const dataProd = await apiRest.getApiData(queryLink);
-		if (dataProd.data.products.length === 0) {
+		const N_F = !Array.isArray(dataProd.data?.products) || dataProd.data.products.length === 0;
+		console.log(queryLink, N_F);
+
+		if (!Array.isArray(dataProd.data?.products) || dataProd.data.products.length === 0) {
 			render.showViewElement(refs.divNotFound, "not-found--visible");
 		}
 		//console.log(dataProd);
@@ -47,7 +50,7 @@ const renderProducts = async (queryLink, loadMore = false) => {
 const renderProductsModal = async (queryLink) => {
 	try {
 		const dataProd = await apiRest.getApiData(queryLink);
-		console.log(dataProd.data, refs.productModal);
+		console.log(dataProd.data, "render", refs.productModal);
 		render.createMarcup(refs.productModal, dataProd.data, render.markUpProductModal, true);
 		render.showViewElement(refs.sectionModal, 'modal--is-open');
 		//refs.sectionModal.classList.add('modal--is-open');
@@ -65,16 +68,10 @@ refs.categoryList.addEventListener("click", (e) => {
 	render.clearElement(refs.productList);
 	refs.currentQuery = li.dataset.url;
 
-	const vQuery = refs.currentQuery + `?limit=12&skip=${(refs.currentPage - 1) * 12}`;
+	//const vQuery = refs.currentQuery + `?limit=12&skip=${(refs.currentPage - 1) * 12}`;
+	const cPage = (refs.currentPage - 1) * 12
+	const vQuery = apiRest.buildQuery(refs.currentQuery, cPage, refs.defLimit);
 	renderProducts(vQuery);
-});
-refs.load_more.addEventListener("click", (e) => {
-	refs.load_more.disabled = true;
-	refs.currentPage++;
-	const vQuery = refs.currentQuery + `&limit=${refs.defLimit}&skip=${(refs.currentPage - 1) * refs.defLimit}`;
-	console.log(vQuery);
-	renderProducts(vQuery, true);
-
 });
 refs.productList.addEventListener("click", (e) => {
 	const prodEl = e.target.closest(".products__item");
@@ -88,6 +85,18 @@ refs.productList.addEventListener("click", (e) => {
 
 	renderProductsModal(vQuery);
 });
+refs.load_more.addEventListener("click", (e) => {
+	refs.load_more.disabled = true;
+	refs.currentPage++;
+
+	const cPage = (refs.currentPage - 1) * 12
+	const vQuery = apiRest.buildQuery(refs.currentQuery, cPage, refs.defLimit);
+	//onst vQuery = refs.currentQuery + `&limit=${refs.defLimit}&skip=${(refs.currentPage - 1) * refs.defLimit}`;
+	console.log(vQuery);
+	renderProducts(vQuery, true);
+
+});
+
 refs.closeBtnModal.addEventListener("click", (e) => {
 	render.hideViewElement(refs.sectionModal, 'modal--is-open');
 	//.classList.remove('modal--is-open');
@@ -110,11 +119,12 @@ refs.searchForm.addEventListener("submit", (e) => {
 
 	renderProducts(vQuery);
 });
+
 refs.addToCart.addEventListener("click", (e) => {
-	helper.confirmAnfCloseModal(refs.addToCart, 2, refs.CD_DATA);
+	storageLib.confirmAndCloseModal(refs.addToCart, refs.CD_DATA);
 });
 refs.addToWishList.addEventListener("click", (e) => {
-	helper.confirmAnfCloseModal(refs.addToWishList, 1, refs.WL_DATA);
+	storageLib.confirmAndCloseModal(refs.addToWishList, refs.WL_DATA);
 });
 
 //////// main load

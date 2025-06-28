@@ -8,4 +8,6 @@ export async function getApiData(url) {
 		.catch(error => error.message);
 };
 
-
+export const buildQuery = (base, page, limit) => {
+	return `${base}?limit=${limit}&skip=${(page - 1) * limit}`;
+};
