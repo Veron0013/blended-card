@@ -1,2 +1,2 @@
-import"./assets/styles-DT-UWGMR.js";import{f as o}from"./assets/storage-_NphWXHv.js";document.addEventListener("DOMContentLoaded",()=>{console.log("cart"),o()});
+import"./assets/styles-DT-UWGMR.js";import{u as e}from"./assets/storage-Dd-qVddR.js";document.addEventListener("DOMContentLoaded",()=>{console.log("cart"),e()});
 //# sourceMappingURL=cart.js.map
