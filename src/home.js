@@ -2,6 +2,8 @@
 import refs from "./js/refs.js";
 import * as render from "./js/render-function.js";
 import * as apiRest from "./js/products-api.js";
+import * as helper from "./js/helpers.js";
+
 
 
 const renderCategories = async () => {
@@ -14,15 +16,16 @@ const renderCategories = async () => {
 	catch (e) {
 		console.log(e.message);
 	}
+
 }
 const renderProducts = async (queryLink, loadMore = false) => {
-	render.hideViewElement(refs.load_more, "hidden");
-	render.showViewElement(refs.divNotFound, "not-found--visible");
+	render.showViewElement(refs.load_more, "hidden");
+	render.hideViewElement(refs.divNotFound, "not-found--visible");
 
 	try {
 		const dataProd = await apiRest.getApiData(queryLink);
 		if (dataProd.data.products.length === 0) {
-			render.hideViewElement(refs.divNotFound, "not-found--visible");
+			render.showViewElement(refs.divNotFound, "not-found--visible");
 		}
 		//console.log(dataProd);
 		render.createMarcup(refs.productList, dataProd.data.products, render.markUpProducts, !loadMore);
@@ -31,7 +34,7 @@ const renderProducts = async (queryLink, loadMore = false) => {
 		console.log(refs.totalItems, refs.currentPage * refs.defLimit);
 
 		if (refs.totalItems > refs.currentPage * refs.defLimit) {
-			render.showViewElement(refs.load_more, "hidden");
+			render.hideViewElement(refs.load_more, "hidden");
 		}
 	}
 	catch (e) {
@@ -46,13 +49,13 @@ const renderProductsModal = async (queryLink) => {
 		const dataProd = await apiRest.getApiData(queryLink);
 		console.log(dataProd.data, refs.productModal);
 		render.createMarcup(refs.productModal, dataProd.data, render.markUpProductModal, true);
-		refs.sectionModal.classList.add('modal--is-open');
+		render.showViewElement(refs.sectionModal, 'modal--is-open');
+		//refs.sectionModal.classList.add('modal--is-open');
 	}
 	catch (e) {
 		console.log(e.message);
 	}
 }
-
 
 refs.categoryList.addEventListener("click", (e) => {
 	const li = e.target.closest(".categories__item");
@@ -84,12 +87,15 @@ refs.productList.addEventListener("click", (e) => {
 	console.log(vQuery);
 
 	renderProductsModal(vQuery);
-})
+});
 refs.closeBtnModal.addEventListener("click", (e) => {
-	refs.sectionModal.classList.remove('modal--is-open');
-})
+	render.hideViewElement(refs.sectionModal, 'modal--is-open');
+	//.classList.remove('modal--is-open');
+});
 refs.searchForm.addEventListener("submit", (e) => {
 	e.preventDefault();
+
+	localStorage.clear();
 
 	refs.currentPage = 1;
 	//renderTools.clearElement(renderTools.productList);
@@ -103,6 +109,17 @@ refs.searchForm.addEventListener("submit", (e) => {
 	console.log(vQuery);
 
 	renderProducts(vQuery);
-})
+});
+refs.addToCart.addEventListener("click", (e) => {
+	helper.confirmAnfCloseModal(refs.addToCart, 2, refs.CD_DATA);
+});
+refs.addToWishList.addEventListener("click", (e) => {
+	helper.confirmAnfCloseModal(refs.addToWishList, 1, refs.WL_DATA);
+});
 
-renderCategories();
+//////// main load
+document.addEventListener("DOMContentLoaded", () => {
+	console.log("home");
+
+	renderCategories();
+});

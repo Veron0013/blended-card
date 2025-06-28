@@ -66,9 +66,9 @@ export function clearElement(element) {
 }
 
 export function hideViewElement(element, className) {
-	element.classList.add(className);
+	element.classList.remove(className);
 }
 
 export function showViewElement(element, className) {
-	element.classList.remove(className);
+	element.classList.add(className);
 }
