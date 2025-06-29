@@ -88,7 +88,7 @@ export function validateStorageData(button, dataKey, refConst, addConst, removeC
 export function updateButtonState(button, storageKey, labelAdd, labelRemove, callBack) {
 	const isInStorage = callBack(storageKey, refs.productID);
 	button.textContent = isInStorage ? labelRemove : labelAdd;
-	console.log(button, isInStorage, storageKey);
+	//console.log(button, isInStorage, storageKey);
 
 	return isInStorage;
 }

@@ -1,6 +1,5 @@
 // Функції для роботи з бекендом
 import axios from "axios";
-import refs from "./refs";
 
 export async function getApiData(url) {
 	return await axios.get(url)
@@ -8,6 +7,6 @@ export async function getApiData(url) {
 		.catch(error => error.message);
 };
 
-export const buildQuery = (base, page, limit) => {
-	return `${base}?limit=${limit}&skip=${(page - 1) * limit}`;
+export const buildQuery = (base, page, limit, sym = "?") => {
+	return `${base}${sym}limit=${limit}&skip=${page}`;
 };

@@ -11,6 +11,7 @@ export default {
 	price: 0,
 	inWishList: false,
 	inCardList: false,
+	isSearch: false,
 	//LS vars
 	WL_DATA: "wishListData",
 	CD_DATA: "cardData",

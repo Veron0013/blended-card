@@ -8,7 +8,7 @@ const renderCategories = async () => {
 
 	try {
 		const dataCat = await apiRest.getApiData(refs.qCategories);
-		console.log(dataCat);
+		//console.log(dataCat);
 		render.createMarcup(refs.categoryList, dataCat.data, render.markUpCategories, true);
 	}
 	catch (e) {
@@ -23,16 +23,15 @@ const renderProducts = async (queryLink, loadMore = false) => {
 	try {
 		const dataProd = await apiRest.getApiData(queryLink);
 		const N_F = !Array.isArray(dataProd.data?.products) || dataProd.data.products.length === 0;
-		console.log(queryLink, N_F);
 
-		if (!Array.isArray(dataProd.data?.products) || dataProd.data.products.length === 0) {
+		if (N_F) {
 			render.showViewElement(refs.divNotFound, "not-found--visible");
 		}
 		//console.log(dataProd);
 		render.createMarcup(refs.productList, dataProd.data.products, render.markUpProducts, !loadMore);
 		refs.totalItems = dataProd.data.total;
 
-		console.log(refs.totalItems, refs.currentPage * refs.defLimit);
+		//console.log(refs.totalItems, refs.currentPage * refs.defLimit);
 
 		if (refs.totalItems > refs.currentPage * refs.defLimit) {
 			render.hideViewElement(refs.load_more, "hidden");
@@ -48,7 +47,7 @@ const renderProducts = async (queryLink, loadMore = false) => {
 const renderProductsModal = async (queryLink) => {
 	try {
 		const dataProd = await apiRest.getApiData(queryLink);
-		console.log(dataProd.data, "render", refs.productModal);
+		//console.log(dataProd.data, "render", refs.productModal);
 		render.createMarcup(refs.productModal, dataProd.data, render.markUpProductModal, true);
 		render.showViewElement(refs.sectionModal, 'modal--is-open');
 
@@ -65,6 +64,7 @@ refs.categoryList.addEventListener("click", (e) => {
 	const li = e.target.closest(".categories__item");
 	if (!li) return;
 
+	refs.isSearch = false;
 	refs.currentPage = 1;
 	render.clearElement(refs.productList);
 	refs.currentQuery = li.dataset.url;
@@ -86,13 +86,14 @@ refs.productList.addEventListener("click", (e) => {
 
 	renderProductsModal(vQuery);
 });
+///не читає всі товари
 refs.load_more.addEventListener("click", (e) => {
 	refs.load_more.disabled = true;
 	refs.currentPage++;
 
 	const cPage = (refs.currentPage - 1) * 12
-	const vQuery = apiRest.buildQuery(refs.currentQuery, cPage, refs.defLimit);
-	//onst vQuery = refs.currentQuery + `&limit=${refs.defLimit}&skip=${(refs.currentPage - 1) * refs.defLimit}`;
+	const sym = refs.isSearch ? "&" : "?";
+	const vQuery = apiRest.buildQuery(refs.currentQuery, cPage, refs.defLimit, sym);
 	console.log(vQuery);
 	renderProducts(vQuery, true);
 
@@ -106,6 +107,7 @@ refs.searchForm.addEventListener("submit", (e) => {
 	e.preventDefault();
 
 	localStorage.clear();
+	refs.isSearch = true;
 
 	refs.currentPage = 1;
 	//renderTools.clearElement(renderTools.productList);
@@ -116,7 +118,7 @@ refs.searchForm.addEventListener("submit", (e) => {
 	if (searchData.length < 1) return;
 	refs.currentQuery = refs.BASE_URL + `/search?q=${searchData}`;
 	const vQuery = `${refs.currentQuery}&limit=${refs.defLimit}&skip=${(refs.currentPage - 1) * refs.defLimit}`;
-	console.log(vQuery);
+	//console.log(vQuery);
 
 	renderProducts(vQuery);
 });
@@ -169,7 +171,7 @@ refs.addToWishList.addEventListener("click", (e) => {
 
 //////// main load
 document.addEventListener("DOMContentLoaded", () => {
-	console.log("home");
+	console.log("Кнопка search чистить local storage");
 
 	renderCategories();
 });
