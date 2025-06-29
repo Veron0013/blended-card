@@ -4,8 +4,6 @@ import * as render from "./js/render-function.js";
 import * as apiRest from "./js/products-api.js";
 import * as storageLib from "./js/storage.js";
 
-
-
 const renderCategories = async () => {
 
 	try {
@@ -53,7 +51,10 @@ const renderProductsModal = async (queryLink) => {
 		console.log(dataProd.data, "render", refs.productModal);
 		render.createMarcup(refs.productModal, dataProd.data, render.markUpProductModal, true);
 		render.showViewElement(refs.sectionModal, 'modal--is-open');
-		//refs.sectionModal.classList.add('modal--is-open');
+
+		refs.inWishList = render.updateButtonState(refs.addToWishList, refs.WL_DATA, refs.TW_ADD, refs.TW_REMOVE, storageLib.isInWishListBind);
+
+		refs.inCardList = render.updateButtonState(refs.addToCart, refs.CD_DATA, refs.TC_ADD, refs.TC_REMOVE, storageLib.isInCardListBind);
 	}
 	catch (e) {
 		console.log(e.message);
@@ -121,10 +122,49 @@ refs.searchForm.addEventListener("submit", (e) => {
 });
 
 refs.addToCart.addEventListener("click", (e) => {
-	storageLib.confirmAndCloseModal(refs.addToCart, refs.CD_DATA);
+	storageLib.toggleStorageItem({
+		button: refs.addToCart,
+		key: refs.CD_DATA,
+		id: refs.productID,
+		addHandler: (btn, key) => storageLib.confirmAndCloseModal(btn, key, true),
+		checkHandler: storageLib.isInCardListBind,
+		removeHandler: storageLib.RemoveFromStorageBind,
+		updateButton: render.updateButtonState,
+		labelAdd: refs.TC_ADD,
+		labelRemove: refs.TC_REMOVE,
+		isCard: true
+	});
+	//const isInStorage = storageLib.isInCardListBind(refs.CD_DATA, refs.productID);
+	//if (isInStorage) {
+	//	storageLib.StorageService.removeFromStorage(refs.CD_DATA, refs.productID, true);
+	//} else {
+	//	storageLib.confirmAndCloseModal(refs.addToCart, refs.CD_DATA, true);
+	//}
+	//refs.inCardList = render.updateButtonState(refs.addToCart, refs.CD_DATA, refs.TC_ADD, refs.TC_REMOVE, storageLib.isInCardListBind);
+
+	//storageLib.updateHeader();
 });
 refs.addToWishList.addEventListener("click", (e) => {
-	storageLib.confirmAndCloseModal(refs.addToWishList, refs.WL_DATA);
+	storageLib.toggleStorageItem({
+		button: refs.addToWishList,
+		key: refs.WL_DATA,
+		id: refs.productID,
+		addHandler: (btn, key) => storageLib.confirmAndCloseModal(btn, key),
+		checkHandler: storageLib.isInWishListBind,
+		removeHandler: storageLib.RemoveFromStorageBind,
+		updateButton: render.updateButtonState,
+		labelAdd: refs.TW_ADD,
+		labelRemove: refs.TW_REMOVE
+	});
+	//const isInStorage = storageLib.isInWishListBind(refs.WL_DATA, refs.productID);
+	//if (isInStorage) {
+	//	storageLib.StorageService.removeFromStorage(refs.WL_DATA, refs.productID);
+	//} else {
+	//	storageLib.confirmAndCloseModal(refs.addToWishList, refs.WL_DATA);
+	//}
+	//refs.inWishList = render.updateButtonState(refs.addToWishList, refs.WL_DATA, refs.TW_ADD, refs.TW_REMOVE, storageLib.isInWishListBind);
+
+	//storageLib.updateHeader();
 });
 
 //////// main load

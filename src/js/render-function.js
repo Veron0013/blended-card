@@ -1,6 +1,7 @@
 //Функцію для створення, рендеру або видалення розмітки
 
 import refs from "./refs";
+import * as storageLib from "./storage.js";
 
 export function createMarcup(element, data, callBack, clearElement = false) {
 	if (clearElement) {
@@ -56,6 +57,7 @@ export const markUpProductModal = ({ id, title, description, dimensions, categor
 	//console.log("mark", mkData);
 
 	refs.productID = id;
+	refs.price = price;
 
 	return mkData;
 }
@@ -70,4 +72,23 @@ export function hideViewElement(element, className) {
 
 export function showViewElement(element, className) {
 	element.classList.add(className);
+}
+
+export function validateStorageData(button, dataKey, refConst, addConst, removeConst) {
+
+	refConst = storageLib.StorageService.isInWishList(dataKey, refs.productID);
+	button.textContent = refConst ? addConst : removeConst;
+}
+
+//refs.isInWishList = storageLib.StorageService.isInCardList(refs.CD_DATA, refs.productID);
+//refs.addToCart.textContent = refs.isInWishList ? refs.TC_REMOVE : refs.TC_ADD;
+
+//validateStorageData(refs.addToCart, refs.CD_DATA, refs.isInWishList, refs.TC_ADD, refs.TC_REMOVE);
+
+export function updateButtonState(button, storageKey, labelAdd, labelRemove, callBack) {
+	const isInStorage = callBack(storageKey, refs.productID);
+	button.textContent = isInStorage ? labelRemove : labelAdd;
+	console.log(button, isInStorage, storageKey);
+
+	return isInStorage;
 }
