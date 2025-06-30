@@ -2,6 +2,7 @@
 
 import refs from "./refs";
 import * as storageLib from "./storage.js";
+import * as apiRest from "./products-api.js";
 
 export function createMarcup(element, data, callBack, clearElement = false) {
 	if (clearElement) {
@@ -66,11 +67,11 @@ export function clearElement(element) {
 	element.innerHTML = '';
 }
 
-export function hideViewElement(element, className) {
+export function removeClassElement(element, className) {
 	element.classList.remove(className);
 }
 
-export function showViewElement(element, className) {
+export function addClassElement(element, className) {
 	element.classList.add(className);
 }
 
@@ -89,6 +90,78 @@ export function updateButtonState(button, storageKey, labelAdd, labelRemove, cal
 	const isInStorage = callBack(storageKey, refs.productID);
 	button.textContent = isInStorage ? labelRemove : labelAdd;
 	//console.log(button, isInStorage, storageKey);
-
 	return isInStorage;
+}
+
+export const renderProductsModal = async (queryLink) => {
+	try {
+		const dataProd = await apiRest.getApiData(queryLink);
+		//console.log(dataProd.data, "render", refs.productModal);
+		createMarcup(refs.productModal, dataProd.data, markUpProductModal, true);
+		addClassElement(refs.sectionModal, 'modal--is-open');
+
+		refs.inWishList = updateButtonState(refs.addToWishList, refs.WL_DATA, refs.TW_ADD, refs.TW_REMOVE, storageLib.isInWishListBind);
+
+		refs.inCardList = updateButtonState(refs.addToCart, refs.CD_DATA, refs.TC_ADD, refs.TC_REMOVE, storageLib.isInCardListBind);
+	}
+	catch (e) {
+		console.log(e.message);
+	}
+}
+
+export function cardListLoad(mode) {
+	console.log("cart/list");
+	clearElement(refs.productList);
+
+	storageLib.updateHeader();
+	if (mode === refs.CD_DATA) {
+		storageLib.StorageService.setCountTo(refs.cardItemsCount, refs.CD_DATA);
+		storageLib.StorageService.setTotalCard(refs.cardItemsTotal);
+	}
+	markUpCardListProducts(mode);
+
+	addClassElement(refs.searchForm, "hidden");
+}
+
+export async function markUpCardListProducts(storageKey) {
+	const storageData = storageLib.StorageService.get(storageKey);
+
+	console.log(storageKey, storageData);
+	//const mkUpData = [];
+	//for (const item of storageData) {
+	//	const prodId = storageKey === refs.CD_DATA ? item.id : item;
+
+	//	const vQuery = refs.BASE_URL + `/${prodId}`;
+	//	try {
+	//		const dataProd = await apiRest.getApiData(vQuery);
+	//		console.log(dataProd.data.length);
+	//		if (dataProd.data) {
+	//			mkUpData.push(dataProd.data)
+	//		}
+	//	} catch (error) {
+	//		console.log(error);
+	//		continue;
+	//	}
+	//}
+	const promises = storageData.map(item => {
+		const prodId = storageKey === refs.CD_DATA ? item.id : item;
+		const vQuery = refs.BASE_URL + `/${prodId}`;
+		return apiRest.getApiData(vQuery)
+			.then(data => data.data)
+			.catch(error => {
+				console.error("Помилка для id:", prodId, error);
+				return null; // Пропускаємо зламані
+			});
+	});
+
+	//console.log(promises);
+
+	const results = await Promise.all(promises);
+
+	// Фільтруємо null або undefined
+	const mkUpData = results.filter(Boolean);
+
+	console.log("марк", mkUpData);
+
+	createMarcup(refs.productList, mkUpData, markUpProducts, false);
 }

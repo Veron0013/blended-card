@@ -16,7 +16,7 @@
 //	buton.disabled = true;
 
 //	storageLib.StorageService.add(keyData, refs.productID);
-//	render.hideViewElement(refs.sectionModal, 'modal--is-open');
+//	render.removeClassElement(refs.sectionModal, 'modal--is-open');
 //	buton.disabled = false;
 
 //	storageLib.updateHeader();

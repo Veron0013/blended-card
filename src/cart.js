@@ -7,47 +7,75 @@ import * as storageLib from "./js/storage.js";
 
 
 document.addEventListener("DOMContentLoaded", () => {
-	console.log("cart");
-
-	storageLib.updateHeader();
-
-	storageLib.StorageService.setCountTo(refs.cardItemsCount, refs.CD_DATA);
-	storageLib.StorageService.setTotalCard(refs.cardItemsTotal);
-	markUpCardProducts();
+	render.cardListLoad(refs.CD_DATA);
 });
 
-async function markUpCardProducts() {
-	const storageData = storageLib.StorageService.get(refs.CD_DATA);
-	const mkUpData = [];
-	for (const item of storageData) {
-		const vQuery = refs.BASE_URL + `/${item.id}`;
-		try {
-			const dataProd = await apiRest.getApiData(vQuery);
-			console.log(dataProd.data.length);
-			if (dataProd.data) {
-				mkUpData.push(dataProd.data)
-			}
-		} catch (error) {
-			console.log(error);
-			continue;
-		}
-	}
+//function cardLoad() {
+//	console.log("cart");
+//	render.clearElement(refs.productList);
 
-	console.log("марк", mkUpData);
+//	storageLib.updateHeader();
+//	storageLib.StorageService.setCountTo(refs.cardItemsCount, refs.CD_DATA);
+//	storageLib.StorageService.setTotalCard(refs.cardItemsTotal);
 
-	render.createMarcup(refs.productList, mkUpData, render.markUpProducts, false);
+//	markUpCardProducts();
+//}
 
-}
+
 
 const renderProducts = async (queryLink) => {
 	try {
 		const dataProd = await apiRest.getApiData(queryLink);
 		console.log(dataProd.data, "render", refs.productModal);
 		render.createMarcup(refs.productModal, dataProd.data, render.markUpProductModal, true);
-		render.showViewElement(refs.sectionModal, 'modal--is-open');
+		render.addClassElement(refs.sectionModal, 'modal--is-open');
 		//refs.sectionModal.classList.add('modal--is-open');
 	}
 	catch (e) {
 		console.log(e.message);
 	}
 }
+
+refs.productList.addEventListener("click", (e) => {
+	const prodEl = e.target.closest(".products__item");
+	if (!prodEl) return;
+
+	console.log(prodEl);
+	const prodId = prodEl.dataset.id;
+
+	const vQuery = refs.BASE_URL + `/${prodId}`;
+	console.log(vQuery);
+
+	render.renderProductsModal(vQuery);
+});
+refs.closeBtnModal.addEventListener("click", (e) => {
+	render.removeClassElement(refs.sectionModal, 'modal--is-open');
+	cardLoad();
+});
+refs.addToCart.addEventListener("click", (e) => {
+	storageLib.toggleStorageItem({
+		button: refs.addToCart,
+		key: refs.CD_DATA,
+		id: refs.productID,
+		addHandler: (btn, key) => storageLib.confirmAndCloseModal(btn, key, true),
+		checkHandler: storageLib.isInCardListBind,
+		removeHandler: storageLib.RemoveFromStorageBind,
+		updateButton: render.updateButtonState,
+		labelAdd: refs.TC_ADD,
+		labelRemove: refs.TC_REMOVE,
+		isCard: true
+	});
+});
+refs.addToWishList.addEventListener("click", (e) => {
+	storageLib.toggleStorageItem({
+		button: refs.addToWishList,
+		key: refs.WL_DATA,
+		id: refs.productID,
+		addHandler: (btn, key) => storageLib.confirmAndCloseModal(btn, key),
+		checkHandler: storageLib.isInWishListBind,
+		removeHandler: storageLib.RemoveFromStorageBind,
+		updateButton: render.updateButtonState,
+		labelAdd: refs.TW_ADD,
+		labelRemove: refs.TW_REMOVE
+	});
+});

@@ -73,7 +73,7 @@ export const StorageService = {
 			.find(x => x === id) !== undefined;
 	},
 	setCountTo(el, key) {
-		el.textContent = this.count(key);
+		el.textContent = this.count(key) || 0;
 	},
 };
 
@@ -88,7 +88,7 @@ export function confirmAndCloseModal(button, keyData, addToCard = false) {
 	} else {
 		StorageService.addToWishList(keyData, refs.productID);
 	}
-	//render.hideViewElement(refs.sectionModal, 'modal--is-open');
+	//render.removeClassElement(refs.sectionModal, 'modal--is-open');
 	button.disabled = false;
 
 	updateHeader();

@@ -17,15 +17,15 @@ const renderCategories = async () => {
 
 }
 const renderProducts = async (queryLink, loadMore = false) => {
-	render.showViewElement(refs.load_more, "hidden");
-	render.hideViewElement(refs.divNotFound, "not-found--visible");
+	render.addClassElement(refs.load_more, "hidden");
+	render.removeClassElement(refs.divNotFound, "not-found--visible");
 
 	try {
 		const dataProd = await apiRest.getApiData(queryLink);
 		const N_F = !Array.isArray(dataProd.data?.products) || dataProd.data.products.length === 0;
 
 		if (N_F) {
-			render.showViewElement(refs.divNotFound, "not-found--visible");
+			render.addClassElement(refs.divNotFound, "not-found--visible");
 		}
 		//console.log(dataProd);
 		render.createMarcup(refs.productList, dataProd.data.products, render.markUpProducts, !loadMore);
@@ -34,7 +34,7 @@ const renderProducts = async (queryLink, loadMore = false) => {
 		//console.log(refs.totalItems, refs.currentPage * refs.defLimit);
 
 		if (refs.totalItems > refs.currentPage * refs.defLimit) {
-			render.hideViewElement(refs.load_more, "hidden");
+			render.removeClassElement(refs.load_more, "hidden");
 		}
 	}
 	catch (e) {
@@ -42,21 +42,6 @@ const renderProducts = async (queryLink, loadMore = false) => {
 	}
 	finally {
 		refs.load_more.disabled = false;
-	}
-}
-const renderProductsModal = async (queryLink) => {
-	try {
-		const dataProd = await apiRest.getApiData(queryLink);
-		//console.log(dataProd.data, "render", refs.productModal);
-		render.createMarcup(refs.productModal, dataProd.data, render.markUpProductModal, true);
-		render.showViewElement(refs.sectionModal, 'modal--is-open');
-
-		refs.inWishList = render.updateButtonState(refs.addToWishList, refs.WL_DATA, refs.TW_ADD, refs.TW_REMOVE, storageLib.isInWishListBind);
-
-		refs.inCardList = render.updateButtonState(refs.addToCart, refs.CD_DATA, refs.TC_ADD, refs.TC_REMOVE, storageLib.isInCardListBind);
-	}
-	catch (e) {
-		console.log(e.message);
 	}
 }
 
@@ -84,7 +69,7 @@ refs.productList.addEventListener("click", (e) => {
 	const vQuery = refs.BASE_URL + `/${prodId}`;
 	console.log(vQuery);
 
-	renderProductsModal(vQuery);
+	render.renderProductsModal(vQuery);
 });
 ///не читає всі товари
 refs.load_more.addEventListener("click", (e) => {
@@ -100,7 +85,7 @@ refs.load_more.addEventListener("click", (e) => {
 });
 
 refs.closeBtnModal.addEventListener("click", (e) => {
-	render.hideViewElement(refs.sectionModal, 'modal--is-open');
+	render.removeClassElement(refs.sectionModal, 'modal--is-open');
 	//.classList.remove('modal--is-open');
 });
 refs.searchForm.addEventListener("submit", (e) => {
@@ -174,4 +159,19 @@ document.addEventListener("DOMContentLoaded", () => {
 	console.log("Кнопка search чистить local storage");
 
 	renderCategories();
+	render.removeClassElement(refs.searchForm, "hidden");
+});
+
+window.addEventListener("scroll", () => {
+	console.log(window.scrollY);
+
+	if (window.scrollY > 600) {
+		render.removeClassElement(refs.backoTop, "hidden");
+	} else {
+		render.addClassElement(refs.backoTop, "hidden");
+	}
+});
+
+refs.backoTop.addEventListener("click", () => {
+	window.scrollTo({ top: 0, behavior: "smooth" });
 });

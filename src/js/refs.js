@@ -39,5 +39,6 @@ export default {
 	wishCount: document.querySelector("[data-wishlist-count]"),
 	//card elements
 	cardItemsCount: document.querySelector("[data-count]"),
-	cardItemsTotal: document.querySelector("[data-price]")
+	cardItemsTotal: document.querySelector("[data-price]"),
+	backoTop: document.querySelector(".back-to-top")
 };
