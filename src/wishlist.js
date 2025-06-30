@@ -5,10 +5,6 @@ import * as apiRest from "./js/products-api.js";
 import * as storageLib from "./js/storage.js";
 
 
-document.addEventListener("DOMContentLoaded", () => {
-	render.cardListLoad(refs.WL_DATA);
-});
-
 refs.productList.addEventListener("click", (e) => {
 	const prodEl = e.target.closest(".products__item");
 	if (!prodEl) return;
@@ -23,6 +19,7 @@ refs.productList.addEventListener("click", (e) => {
 });
 refs.closeBtnModal.addEventListener("click", (e) => {
 	render.removeClassElement(refs.sectionModal, 'modal--is-open');
+	render.cardListLoad(refs.WL_DATA);
 });
 refs.addToCart.addEventListener("click", (e) => {
 	storageLib.toggleStorageItem({
@@ -50,4 +47,22 @@ refs.addToWishList.addEventListener("click", (e) => {
 		labelAdd: refs.TW_ADD,
 		labelRemove: refs.TW_REMOVE
 	});
+});
+
+window.addEventListener("scroll", () => {
+	console.log(window.scrollY);
+
+	if (window.scrollY > 600) {
+		render.removeClassElement(refs.backoTop, "hidden");
+	} else {
+		render.addClassElement(refs.backoTop, "hidden");
+	}
+});
+
+refs.backoTop.addEventListener("click", () => {
+	window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+	render.cardListLoad(refs.WL_DATA);
 });
