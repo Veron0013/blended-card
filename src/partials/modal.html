@@ -1,3 +1,4 @@
+<load icon-path="img/sprite.svg#logo" />
 <div class="modal">
   <div class="modal__content">
     <button class="modal__close-btn" type="button"></button>
@@ -19,6 +20,7 @@
 <button type="button" id="back-to-top" class="back-to-top hidden">
   <!--<img src="/img/upArrow.svg" alt="up arrow" />-->
   <svg class="logo__icon" width="24" height="24">
-    <use href="img/upArrow.svg"></use>
+    <!--<use href="img/upArrow.svg"></use>-->
+    <use href="{=$icon-path}"></use>
   </svg>
 </button>
